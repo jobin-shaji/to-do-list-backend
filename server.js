@@ -10,8 +10,7 @@ app.use(cors());
 app.use(express.json()); // Use express.json() instead of body-parser
 
 // MongoDB Atlas connection
-const MONGO_URI =
-  "mongodb+srv://jobinshaji111:jobin123@cluster0.rw0xz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const MONGO_URI = process.env.MONGO_URI;
 
 mongoose
   .connect(MONGO_URI, {
