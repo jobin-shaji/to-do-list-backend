@@ -28,22 +28,6 @@ const taskSchema = new mongoose.Schema({
 
 const Task = mongoose.model("Task", taskSchema);
 
-// Route to insert sample data
-app.get("/insert-sample", async (req, res) => {
-  try {
-    const sampleTasks = [
-      { task: "sdsadsad  1" },
-      { task: "Sample Task 2" },
-      { task: "Sample Task 3" },
-    ];
-    await Task.insertMany(sampleTasks);
-    res.send("Sample tasks inserted successfully!");
-  } catch (error) {
-    console.error("Error inserting sample tasks:", error);
-    res.status(500).send("Error inserting sample tasks");
-  }
-});
-
 // Route to insert data from the frontend
 app.post("/tasks", async (req, res) => {
   try {
@@ -86,6 +70,33 @@ app.delete("/tasks/:id", async (req, res) => {
   }
 });
 
+// Route to update a task in the database
+app.put("/tasks/:id", async (req, res) => {
+  try {
+    const { id } = req.params; // Get the task ID from the URL
+    const { task } = req.body; // Get the updated task data from the request body
+
+    if (!task) {
+      return res.status(400).json({ error: "Task is required" });
+    }
+
+    const updatedTask = await Task.findByIdAndUpdate(
+      id,
+      { task },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedTask) {
+      return res.status(404).json({ error: "Task not found" });
+    }
+
+    res.json({ message: "Task updated successfully", task: updatedTask });
+  } catch (error) {
+    console.error("Error updating task:", error);
+    res.status(500).send("Error updating task");
+  }
+});
+
 // Test route
 app.get("/", (req, res) => {
   res.send("Server is running!");
@@ -93,5 +104,5 @@ app.get("/", (req, res) => {
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server is running on ${MONGO_URI}:${PORT}`);
 });
